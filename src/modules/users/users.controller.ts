@@ -1,8 +1,8 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -10,34 +10,35 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { DBService } from '../db/db.service';
-import { User } from 'src/data/interfaces';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
+import { UserEntity } from '../db/entities/user';
 
 @Controller('user')
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly dbService: DBService,
-  ) {}
+  constructor(private readonly usersService: UsersService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  getAllUsers(): User[] {
+  getAllUsers(): UserEntity[] {
     return this.usersService.getAllUsers();
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  getOneUser(@Param('id', ParseUUIDPipe) id: string) {
+  getOneUser(@Param('id', ParseUUIDPipe) id: string): UserEntity {
     return this.usersService.getOneUser(id);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto): UserEntity {
     return this.usersService.createUser(createUserDto);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,

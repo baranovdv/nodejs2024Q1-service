@@ -1,10 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User } from 'src/data/interfaces';
-import { CreateUserDto, UpdatePasswordDto } from '../users/dto/user.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { Injectable } from '@nestjs/common';
 import { DBFields } from 'src/data/types';
+import { UserEntity } from './entities/user';
 
-const mockUser: User = {
+const mockUser: UserEntity = {
   id: 'ef9ec01e-47ad-4811-aee4-7873ce2e78c1',
   login: 'userLogin',
   password: 'userPassword',
@@ -15,13 +13,13 @@ const mockUser: User = {
 
 @Injectable()
 export class DBService {
-  private users: User[];
+  private users: UserEntity[];
 
   constructor() {
     this.users = [mockUser];
   }
 
-  getAll(field: DBFields): User[] {
+  getAll(field: DBFields): UserEntity[] {
     return this[field];
   }
 

@@ -4,29 +4,31 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from 'src/data/interfaces';
 import { DBService } from '../db/db.service';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
+import { UserEntity } from '../db/entities/user';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly dbService: DBService) {}
 
-  getAllUsers(): User[] {
-    return this.dbService.getAll('users');
+  getAllUsers(): UserEntity[] {
+    const users = this.dbService.getAll('users');
+
+    return users.map((user) => new UserEntity(user));
   }
 
-  getOneUser(id: string): User {
+  getOneUser(id: string): UserEntity {
     const user = this.dbService.getOne('users', id);
 
     if (user === undefined) {
       throw new NotFoundException('No such user');
     }
 
-    return user as User;
+    return new UserEntity(user);
   }
 
-  createUser(dto: CreateUserDto): User {
+  createUser(dto: CreateUserDto): UserEntity {
     const newUser = {
       id: uuidv4(),
       login: dto.login,
@@ -38,10 +40,10 @@ export class UsersService {
 
     this.dbService.create('users', newUser);
 
-    return newUser;
+    return new UserEntity(newUser);
   }
 
-  updateUserPassword(id: string, dto: UpdatePasswordDto): User {
+  updateUserPassword(id: string, dto: UpdatePasswordDto): UserEntity {
     const user = this.getOneUser(id);
 
     if (dto.oldPassword !== user.password) {
@@ -49,6 +51,8 @@ export class UsersService {
     }
 
     user.password = dto.newPassword;
+    user.version += 1;
+    user.updatedAt = Date.now();
 
     const updateResult = this.dbService.update('users', id, user);
 
@@ -56,7 +60,7 @@ export class UsersService {
       throw new NotFoundException('No such user');
     }
 
-    return user;
+    return new UserEntity(user);
   }
 
   deleteUser(id: string): void {
