@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from 'src/data/interfaces';
-import { CreateUserDto } from '../users/dto/user.dto';
+import { CreateUserDto, UpdatePasswordDto } from '../users/dto/user.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { DBFields } from 'src/data/types';
 
 const mockUser: User = {
-  id: 'qwerty',
+  id: 'ef9ec01e-47ad-4811-aee4-7873ce2e78c1',
   login: 'userLogin',
   password: 'userPassword',
   version: 1,
@@ -20,32 +21,41 @@ export class DBService {
     this.users = [mockUser];
   }
 
-  getAllUsers(): User[] {
-    return this.users;
+  getAll(field: DBFields): User[] {
+    return this[field];
   }
 
-  getOneUser(id: string): User {
-    return this.users.find((user) => user.id === id);
+  getOne(field: DBFields, id: string): Record<string, any> | undefined {
+    const item: Record<string, any> | undefined = this[field].find(
+      (item) => item.id === id,
+    );
+
+    return item;
   }
 
-  createUser(dto: CreateUserDto): User {
-    const newUser = {
-      id: uuidv4(),
-      login: dto.login,
-      password: dto.password,
-      version: 1,
-      createdAt: 0,
-      updatedAt: 0,
-    };
+  create(field: DBFields, data: any): boolean {
+    this[field].push(data);
 
-    this.users.push(newUser);
-
-    return newUser;
+    return true;
   }
 
-  deleteUser(id: string): void {
-    const userIndex = this.users.findIndex((user) => user.id === id);
+  update(field: DBFields, id: string, data: any): boolean {
+    const itemIndex = this[field].findIndex((item) => item.id === id);
 
-    this.users.splice(userIndex, 1);
+    if (itemIndex < 0) return false;
+
+    this[field][itemIndex] = data;
+
+    return true;
+  }
+
+  delete(field: DBFields, id: string): boolean {
+    const itemIndex = this[field].findIndex((item) => item.id === id);
+
+    if (itemIndex < 0) return false;
+
+    this[field].splice(itemIndex, 1);
+
+    return true;
   }
 }
