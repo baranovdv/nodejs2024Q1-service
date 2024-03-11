@@ -11,8 +11,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
-import { TrackEntity } from '../db/entities/track';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
+import { TrackEntity } from '../db/entities/entities';
 
 @Controller('track')
 export class TracksController {
@@ -29,21 +29,21 @@ export class TracksController {
   }
 
   @Post()
-  create(@Body() createUserDto: CreateTrackDto): TrackEntity {
-    return this.tracksService.createTrack(createUserDto);
+  create(@Body() createTrackDto: CreateTrackDto): TrackEntity {
+    return this.tracksService.createTrack(createTrackDto);
   }
 
   @Put(':id')
   update(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateUserDto: UpdateTrackdDto,
+    @Body() updateTrackDto: UpdateTrackdDto,
   ) {
-    return this.tracksService.updateTrack(id, updateUserDto);
+    return this.tracksService.updateTrack(id, updateTrackDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.tracksService.deleteTrack(id);
+    return this.tracksService.deleteTrackByArtistId(id);
   }
 }

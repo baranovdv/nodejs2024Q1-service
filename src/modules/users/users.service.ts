@@ -6,8 +6,8 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
-import { UserEntity } from '../db/entities/user';
 import { DBFields } from 'src/data/types';
+import { UserEntity } from '../db/entities/entities';
 
 const ITEM_TYPE: DBFields = 'users';
 const NO_SUCH_ITEM = 'No such user';

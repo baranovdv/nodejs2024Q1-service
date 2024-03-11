@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
-import { TrackEntity } from '../db/entities/track';
 import { DBFields } from 'src/data/types';
+import { TrackEntity } from '../db/entities/entities';
 
 const ITEM_TYPE: DBFields = 'tracks';
 const NO_SUCH_ITEM = 'No such track';
@@ -61,4 +61,30 @@ export class TracksService {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
   }
+
+  deleteTrackByArtistId(id: string): void {
+    const tracks = this.getAllTracks();
+
+    const track = tracks.find((track) => track.artistId === id);
+
+    if (!track) return;
+
+    this.updateTrack(track.id, {
+      ...track,
+      artistId: null,
+    });
+  }
+
+  // deleteAlbumByArtistId(id: string): void {
+  //   const tracks = this.getAllTracks();
+
+  //   const track = tracks.find((track) => track.artistId === id);
+
+  //   if (!track) return;
+
+  //   this.updateTrack(track.id, {
+  //     ...track,
+  //     artistId: null,
+  //   });
+  // }
 }
