@@ -7,22 +7,26 @@ import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
 import { UserEntity } from '../db/entities/user';
+import { DBFields } from 'src/data/types';
+
+const ITEM_TYPE: DBFields = 'users';
+const NO_SUCH_ITEM = 'No such user';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly dbService: DBService) {}
 
   getAllUsers(): UserEntity[] {
-    const users = this.dbService.getAll('users');
+    const users = this.dbService.getAll(ITEM_TYPE);
 
     return users.map((user) => new UserEntity(user));
   }
 
   getOneUser(id: string): UserEntity {
-    const user = this.dbService.getOne('users', id);
+    const user = this.dbService.getOne(ITEM_TYPE, id);
 
     if (user === undefined) {
-      throw new NotFoundException('No such user');
+      throw new NotFoundException(NO_SUCH_ITEM);
     }
 
     return new UserEntity(user);
@@ -38,7 +42,7 @@ export class UsersService {
       updatedAt: Date.now(),
     };
 
-    this.dbService.create('users', newUser);
+    this.dbService.create(ITEM_TYPE, newUser);
 
     return new UserEntity(newUser);
   }
@@ -54,20 +58,20 @@ export class UsersService {
     user.version += 1;
     user.updatedAt = Date.now();
 
-    const updateResult = this.dbService.update('users', id, user);
+    const updateResult = this.dbService.update(ITEM_TYPE, id, user);
 
     if (!updateResult) {
-      throw new NotFoundException('No such user');
+      throw new NotFoundException(NO_SUCH_ITEM);
     }
 
     return new UserEntity(user);
   }
 
   deleteUser(id: string): void {
-    const deleteResult = this.dbService.delete('users', id);
+    const deleteResult = this.dbService.delete(ITEM_TYPE, id);
 
     if (!deleteResult) {
-      throw new NotFoundException('No such user');
+      throw new NotFoundException(NO_SUCH_ITEM);
     }
   }
 }

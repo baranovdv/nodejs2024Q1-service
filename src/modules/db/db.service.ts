@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DBFields } from 'src/data/types';
 import { UserEntity } from './entities/user';
+import { TrackEntity } from './entities/track';
 
 const mockUser: UserEntity = {
   id: 'ef9ec01e-47ad-4811-aee4-7873ce2e78c1',
@@ -11,15 +12,25 @@ const mockUser: UserEntity = {
   updatedAt: 0,
 };
 
+const mockTrack: TrackEntity = {
+  id: 'id',
+  name: 'track',
+  artistId: 'qwert',
+  albumId: 'alb',
+  duration: 123,
+};
+
 @Injectable()
 export class DBService {
   private users: UserEntity[];
+  private tracks: TrackEntity[];
 
   constructor() {
     this.users = [mockUser];
+    this.tracks = [mockTrack];
   }
 
-  getAll(field: DBFields): UserEntity[] {
+  getAll(field: DBFields): any[] {
     return this[field];
   }
 
