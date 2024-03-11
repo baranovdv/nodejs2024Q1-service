@@ -5,6 +5,7 @@ import { DBFields } from 'src/data/types';
 import { ArtistEntity } from '../db/entities/entities';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
 import { TracksService } from '../tracks/tracks.service';
+import { AlbumsService } from '../albums/albums.service';
 
 const ITEM_TYPE: DBFields = 'artists';
 const NO_SUCH_ITEM = 'No such artist';
@@ -14,6 +15,7 @@ export class ArtistsService {
   constructor(
     private readonly dbService: DBService,
     private readonly tracksService: TracksService,
+    private readonly albumsService: AlbumsService,
   ) {}
 
   getAllArtists(): ArtistEntity[] {
@@ -65,6 +67,7 @@ export class ArtistsService {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
-    this.tracksService.deleteTrackByArtistId(id);
+    this.tracksService.nullArtistIdInTrackByArtistId(id);
+    this.albumsService.nullArtistIdInAlbumByArtistId(id);
   }
 }

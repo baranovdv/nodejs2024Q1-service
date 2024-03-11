@@ -75,16 +75,29 @@ export class TracksService {
     });
   }
 
-  // deleteAlbumByArtistId(id: string): void {
-  //   const tracks = this.getAllTracks();
+  nullArtistIdInTrackByArtistId(id: string): void {
+    const tracks = this.getAllTracks();
 
-  //   const track = tracks.find((track) => track.artistId === id);
+    const track = tracks.find((track) => track.artistId === id);
 
-  //   if (!track) return;
+    if (!track) return;
 
-  //   this.updateTrack(track.id, {
-  //     ...track,
-  //     artistId: null,
-  //   });
-  // }
+    this.updateTrack(track.id, {
+      ...track,
+      artistId: null,
+    });
+  }
+
+  nullAlbumIdInTrackByArtistId(id: string): void {
+    const tracks = this.getAllTracks();
+
+    const track = tracks.find((track) => track.albumId === id);
+
+    if (!track) return;
+
+    this.updateTrack(track.id, {
+      ...track,
+      albumId: null,
+    });
+  }
 }
