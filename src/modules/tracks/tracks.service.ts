@@ -62,19 +62,6 @@ export class TracksService {
     }
   }
 
-  deleteTrackByArtistId(id: string): void {
-    const tracks = this.getAllTracks();
-
-    const track = tracks.find((track) => track.artistId === id);
-
-    if (!track) return;
-
-    this.updateTrack(track.id, {
-      ...track,
-      artistId: null,
-    });
-  }
-
   nullArtistIdInTrackByArtistId(id: string): void {
     const tracks = this.getAllTracks();
 

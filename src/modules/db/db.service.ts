@@ -7,22 +7,22 @@ import {
   UserEntity,
 } from './entities/entities';
 
-const mockUser: UserEntity = {
-  id: 'ef9ec01e-47ad-4811-aee4-7873ce2e78c1',
-  login: 'userLogin',
-  password: 'userPassword',
-  version: 1,
-  createdAt: 0,
-  updatedAt: 0,
-};
+// const mockUser: UserEntity = {
+//   id: 'ef9ec01e-47ad-4811-aee4-7873ce2e78c1',
+//   login: 'userLogin',
+//   password: 'userPassword',
+//   version: 1,
+//   createdAt: 0,
+//   updatedAt: 0,
+// };
 
-const mockTrack: TrackEntity = {
-  id: 'id',
-  name: 'track',
-  artistId: 'qwert',
-  albumId: 'alb',
-  duration: 123,
-};
+// const mockTrack: TrackEntity = {
+//   id: 'id',
+//   name: 'track',
+//   artistId: 'qwert',
+//   albumId: 'alb',
+//   duration: 123,
+// };
 
 @Injectable()
 export class DBService {
@@ -32,8 +32,8 @@ export class DBService {
   private albums: AlbumEntity[];
 
   constructor() {
-    this.users = [mockUser];
-    this.tracks = [mockTrack];
+    this.users = [];
+    this.tracks = [];
     this.artists = [];
     this.albums = [];
   }
