@@ -12,6 +12,7 @@ import { AlbumsService } from '../albums/albums.service';
 
 const ITEM_TYPE: DBFields = 'favs';
 const NO_SUCH_ITEM = 'No such';
+const ITEM_IN_FAVS = 'already in favs';
 const NO_SUCH_ENDPOINT = 'No such endpoint';
 const ITEM_ADDED = 'was added to favorites';
 
@@ -30,31 +31,59 @@ export class FavsService {
 
   addFav(favsType: FavsTypes, id: string) {
     switch (favsType) {
-      case 'track':
+      case 'track': {
         const track = this.tracksService.getOneTrack(id);
 
         if (!track) {
           throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
 
+        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
+
+        const favTrack = favs[`${favsType}s`].find((track) => track.id === id);
+
+        if (favTrack) {
+          throw new UnprocessableEntityException(`${favsType} ${ITEM_IN_FAVS}`);
+        }
+
         this.dbService.addFav(favsType, track);
         return `${favsType} ${ITEM_ADDED}`;
+      }
 
-      case 'album':
+      case 'album': {
         const album = this.albumsService.getOneAlbum(id);
 
         if (!album) {
           throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
 
+        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
+
+        const favAlbum = favs[`${favsType}s`].find((album) => album.id === id);
+
+        if (favAlbum) {
+          throw new UnprocessableEntityException(`${favsType} ${ITEM_IN_FAVS}`);
+        }
+
         this.dbService.addFav(favsType, album);
         return `${favsType} ${ITEM_ADDED}`;
+      }
 
       case 'artist':
         const artist = this.artistsService.getOneArtist(id);
 
         if (!artist) {
           throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
+        }
+
+        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
+
+        const favArtist = favs[`${favsType}s`].find(
+          (artist) => artist.id === id,
+        );
+
+        if (favArtist) {
+          throw new UnprocessableEntityException(`${favsType} ${ITEM_IN_FAVS}`);
         }
 
         this.dbService.addFav(favsType, artist);
