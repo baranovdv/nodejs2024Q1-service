@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Param,
@@ -22,24 +23,28 @@ export class UsersController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
+  @Header('Content-Type', 'application/json')
   getAllUsers(): UserEntity[] {
     return this.usersService.getAllUsers();
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
+  @Header('Content-Type', 'application/json')
   getOneUser(@Param('id', ParseUUIDPipe) id: string): UserEntity {
     return this.usersService.getOneUser(id);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
+  @Header('Content-Type', 'application/json')
   create(@Body() createUserDto: CreateUserDto): UserEntity {
     return this.usersService.createUser(createUserDto);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
+  @Header('Content-Type', 'application/json')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdatePasswordDto,

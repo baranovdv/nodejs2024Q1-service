@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   NotFoundException,
@@ -22,11 +23,13 @@ export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 
   @Get()
+  @Header('Content-Type', 'application/json')
   getAllTracks(): ArtistEntity[] {
     return this.artistsService.getAllArtists();
   }
 
   @Get(':id')
+  @Header('Content-Type', 'application/json')
   getOneUser(@Param('id', ParseUUIDPipe) id: string): ArtistEntity {
     const artist = this.artistsService.getOneArtist(id);
 
@@ -38,11 +41,13 @@ export class ArtistsController {
   }
 
   @Post()
+  @Header('Content-Type', 'application/json')
   create(@Body() createArtistDto: CreateArtistDto): ArtistEntity {
     return this.artistsService.createArtist(createArtistDto);
   }
 
   @Put(':id')
+  @Header('Content-Type', 'application/json')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateArtistDto: UpdateArtistdDto,

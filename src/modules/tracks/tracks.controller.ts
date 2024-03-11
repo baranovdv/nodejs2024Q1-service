@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   NotFoundException,
@@ -22,11 +23,13 @@ export class TracksController {
   constructor(private readonly tracksService: TracksService) {}
 
   @Get()
+  @Header('Content-Type', 'application/json')
   getAllTracks(): TrackEntity[] {
     return this.tracksService.getAllTracks();
   }
 
   @Get(':id')
+  @Header('Content-Type', 'application/json')
   getOneUser(@Param('id', ParseUUIDPipe) id: string): TrackEntity {
     const track = this.tracksService.getOneTrack(id);
 
@@ -38,11 +41,13 @@ export class TracksController {
   }
 
   @Post()
+  @Header('Content-Type', 'application/json')
   create(@Body() createTrackDto: CreateTrackDto): TrackEntity {
     return this.tracksService.createTrack(createTrackDto);
   }
 
   @Put(':id')
+  @Header('Content-Type', 'application/json')
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackdDto,

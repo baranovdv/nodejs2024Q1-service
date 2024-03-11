@@ -88,8 +88,6 @@ export class DBService {
   }
 
   deleteFav(favsType: FavsTypes, id: string) {
-    console.log(id);
-
     const itemIndex = this.favs[`${favsType}s`].findIndex(
       (item) => item.id === id,
     );

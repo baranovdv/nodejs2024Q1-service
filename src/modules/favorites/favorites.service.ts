@@ -47,6 +47,7 @@ export class FavsService {
         }
 
         this.dbService.addFav(favsType, track);
+
         return `${favsType} ${ITEM_ADDED}`;
       }
 
@@ -66,6 +67,7 @@ export class FavsService {
         }
 
         this.dbService.addFav(favsType, album);
+
         return `${favsType} ${ITEM_ADDED}`;
       }
 

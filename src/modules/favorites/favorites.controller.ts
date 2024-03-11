@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   HttpCode,
   HttpStatus,
   Param,
@@ -17,6 +18,7 @@ export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Get()
+  @Header('Content-Type', 'application/json')
   getAllFavs(): FavsEntity {
     return this.favsService.getAllFavs();
   }
