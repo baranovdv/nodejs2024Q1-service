@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
-import { DBFields } from 'src/data/types';
+import { DBFieldsWithId } from 'src/data/types';
 import { ArtistEntity } from '../db/entities/entities';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
 import { TracksService } from '../tracks/tracks.service';
 import { AlbumsService } from '../albums/albums.service';
 
-const ITEM_TYPE: DBFields = 'artists';
+const ITEM_TYPE: DBFieldsWithId = 'artists';
 const NO_SUCH_ITEM = 'No such artist';
 
 @Injectable()
@@ -23,13 +23,7 @@ export class ArtistsService {
   }
 
   getOneArtist(id: string): ArtistEntity {
-    const artist = this.dbService.getOne(ITEM_TYPE, id);
-
-    if (artist === undefined) {
-      throw new NotFoundException(NO_SUCH_ITEM);
-    }
-
-    return artist as ArtistEntity;
+    return this.dbService.getOne(ITEM_TYPE, id) as ArtistEntity | undefined;
   }
 
   createArtist(dto: CreateArtistDto): ArtistEntity {

@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,6 +14,8 @@ import {
 import { ArtistsService } from './artists.service';
 import { ArtistEntity } from '../db/entities/entities';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
+
+const NO_SUCH_ITEM = 'No such artist';
 
 @Controller('artist')
 export class ArtistsController {
@@ -25,7 +28,13 @@ export class ArtistsController {
 
   @Get(':id')
   getOneUser(@Param('id', ParseUUIDPipe) id: string): ArtistEntity {
-    return this.artistsService.getOneArtist(id);
+    const artist = this.artistsService.getOneArtist(id);
+
+    if (artist === undefined) {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
+
+    return artist;
   }
 
   @Post()

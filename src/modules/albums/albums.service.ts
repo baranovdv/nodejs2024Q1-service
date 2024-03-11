@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
-import { DBFields } from 'src/data/types';
+import { DBFieldsWithId } from 'src/data/types';
 import { AlbumEntity } from '../db/entities/entities';
 import { CreateAlbumDto, UpdateAlbumdDto } from './dto/album.dto';
 import { TracksService } from '../tracks/tracks.service';
 
-const ITEM_TYPE: DBFields = 'albums';
+const ITEM_TYPE: DBFieldsWithId = 'albums';
 const NO_SUCH_ITEM = 'No such album';
 
 @Injectable()
@@ -21,13 +21,7 @@ export class AlbumsService {
   }
 
   getOneAlbum(id: string): AlbumEntity {
-    const album = this.dbService.getOne(ITEM_TYPE, id);
-
-    if (album === undefined) {
-      throw new NotFoundException(NO_SUCH_ITEM);
-    }
-
-    return album as AlbumEntity;
+    return this.dbService.getOne(ITEM_TYPE, id) as AlbumEntity | undefined;
   }
 
   createAlbum(dto: CreateAlbumDto): AlbumEntity {

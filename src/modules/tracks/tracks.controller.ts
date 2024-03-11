@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,6 +14,8 @@ import {
 import { TracksService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
 import { TrackEntity } from '../db/entities/entities';
+
+const NO_SUCH_ITEM = 'No such track';
 
 @Controller('track')
 export class TracksController {
@@ -25,7 +28,13 @@ export class TracksController {
 
   @Get(':id')
   getOneUser(@Param('id', ParseUUIDPipe) id: string): TrackEntity {
-    return this.tracksService.getOneTrack(id);
+    const track = this.tracksService.getOneTrack(id);
+
+    if (track === undefined) {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
+
+    return track;
   }
 
   @Post()

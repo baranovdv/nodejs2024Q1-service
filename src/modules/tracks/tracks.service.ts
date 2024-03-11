@@ -2,10 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
-import { DBFields } from 'src/data/types';
+import { DBFieldsWithId } from 'src/data/types';
 import { TrackEntity } from '../db/entities/entities';
 
-const ITEM_TYPE: DBFields = 'tracks';
+const ITEM_TYPE: DBFieldsWithId = 'tracks';
 const NO_SUCH_ITEM = 'No such track';
 
 @Injectable()
@@ -16,14 +16,8 @@ export class TracksService {
     return this.dbService.getAll(ITEM_TYPE);
   }
 
-  getOneTrack(id: string): TrackEntity {
-    const track = this.dbService.getOne(ITEM_TYPE, id);
-
-    if (track === undefined) {
-      throw new NotFoundException(NO_SUCH_ITEM);
-    }
-
-    return track as TrackEntity;
+  getOneTrack(id: string): TrackEntity | undefined {
+    return this.dbService.getOne(ITEM_TYPE, id) as TrackEntity | undefined;
   }
 
   createTrack(dto: CreateTrackDto): TrackEntity {

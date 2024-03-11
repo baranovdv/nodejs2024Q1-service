@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { DBFields } from 'src/data/types';
+import { DBFields, DBFieldsWithId, FavsTypes } from 'src/data/types';
 import {
   AlbumEntity,
   ArtistEntity,
+  FavsEntity,
   TrackEntity,
   UserEntity,
 } from './entities/entities';
@@ -30,33 +31,39 @@ export class DBService {
   private tracks: TrackEntity[];
   private artists: ArtistEntity[];
   private albums: AlbumEntity[];
+  private favs: FavsEntity;
 
   constructor() {
     this.users = [];
     this.tracks = [];
     this.artists = [];
     this.albums = [];
+    this.favs = {
+      tracks: [],
+      albums: [],
+      artists: [],
+    };
   }
 
-  getAll(field: DBFields): any[] {
+  getAll(field: DBFields): any[] | any {
     return this[field];
   }
 
-  getOne(field: DBFields, id: string): Record<string, any> | undefined {
-    const item: Record<string, any> | undefined = this[field].find(
+  getOne(field: DBFieldsWithId, id: string): Record<string, any> | undefined {
+    const item: Record<string, any> | undefined = this[field as string].find(
       (item) => item.id === id,
     );
 
     return item;
   }
 
-  create(field: DBFields, data: any): boolean {
+  create(field: DBFieldsWithId, data: any): boolean {
     this[field].push(data);
 
     return true;
   }
 
-  update(field: DBFields, id: string, data: any): boolean {
+  update(field: DBFieldsWithId, id: string, data: any): boolean {
     const itemIndex = this[field].findIndex((item) => item.id === id);
 
     if (itemIndex < 0) return false;
@@ -66,7 +73,7 @@ export class DBService {
     return true;
   }
 
-  delete(field: DBFields, id: string): boolean {
+  delete(field: DBFieldsWithId, id: string): boolean {
     const itemIndex = this[field].findIndex((item) => item.id === id);
 
     if (itemIndex < 0) return false;
@@ -74,5 +81,29 @@ export class DBService {
     this[field].splice(itemIndex, 1);
 
     return true;
+  }
+
+  addFav(favsType: FavsTypes, data: any) {
+    this.favs[`${favsType}s`].push(data);
+  }
+
+  deleteFav(favsType: FavsTypes, id: string) {
+    console.log(id);
+
+    const itemIndex = this.favs[`${favsType}s`].findIndex(
+      (item) => item.id === id,
+    );
+
+    // console.log(itemIndex);
+
+    // console.log(this.favs[`${favsType}s`][itemIndex]);
+
+    // console.log(this.favs);
+
+    // this.favs[`${favsType}s`] = [];
+
+    this.favs[`${favsType}s`].splice(itemIndex, 1);
+
+    // console.log(this.favs);
   }
 }

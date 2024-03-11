@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -13,6 +14,8 @@ import {
 import { AlbumEntity } from '../db/entities/entities';
 import { CreateAlbumDto, UpdateAlbumdDto } from './dto/album.dto';
 import { AlbumsService } from './albums.service';
+
+const NO_SUCH_ITEM = 'No such album';
 
 @Controller('album')
 export class AlbumsController {
@@ -25,7 +28,13 @@ export class AlbumsController {
 
   @Get(':id')
   getOneUser(@Param('id', ParseUUIDPipe) id: string): AlbumEntity {
-    return this.albumsService.getOneAlbum(id);
+    const album = this.albumsService.getOneAlbum(id);
+
+    if (album === undefined) {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
+
+    return album;
   }
 
   @Post()

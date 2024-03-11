@@ -6,10 +6,10 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
-import { DBFields } from 'src/data/types';
+import { DBFieldsWithId } from 'src/data/types';
 import { UserEntity } from '../db/entities/entities';
 
-const ITEM_TYPE: DBFields = 'users';
+const ITEM_TYPE: DBFieldsWithId = 'users';
 const NO_SUCH_ITEM = 'No such user';
 
 @Injectable()
