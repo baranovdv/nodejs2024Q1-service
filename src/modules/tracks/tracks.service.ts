@@ -54,6 +54,8 @@ export class TracksService {
     if (!deleteResult) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
+
+    this.dbService.deleteFav('track', id);
   }
 
   nullArtistIdInTrackByArtistId(id: string): void {

@@ -1,7 +1,9 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
+  forwardRef,
 } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { DBFields, FavsTypes } from 'src/data/types';
@@ -20,8 +22,11 @@ const ITEM_ADDED = 'was added to favorites';
 export class FavsService {
   constructor(
     private readonly dbService: DBService,
+    @Inject(forwardRef(() => TracksService))
     private readonly tracksService: TracksService,
+    @Inject(forwardRef(() => ArtistsService))
     private readonly artistsService: ArtistsService,
+    @Inject(forwardRef(() => AlbumsService))
     private readonly albumsService: AlbumsService,
   ) {}
 

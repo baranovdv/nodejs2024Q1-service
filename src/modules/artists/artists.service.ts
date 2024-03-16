@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { DBFieldsWithId } from 'src/data/types';
@@ -14,6 +19,7 @@ const NO_SUCH_ITEM = 'No such artist';
 export class ArtistsService {
   constructor(
     private readonly dbService: DBService,
+    @Inject(forwardRef(() => TracksService))
     private readonly tracksService: TracksService,
     private readonly albumsService: AlbumsService,
   ) {}
@@ -63,5 +69,7 @@ export class ArtistsService {
 
     this.tracksService.nullArtistIdInTrackByArtistId(id);
     this.albumsService.nullArtistIdInAlbumByArtistId(id);
+
+    this.dbService.deleteFav('artist', id);
   }
 }
