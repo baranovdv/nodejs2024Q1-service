@@ -7,29 +7,34 @@ import {
   TrackEntity,
   UserEntity,
 } from './entities/entities';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class DBService {
+export class DBService extends PrismaClient {
   private users: UserEntity[];
   private tracks: TrackEntity[];
   private artists: ArtistEntity[];
   private albums: AlbumEntity[];
   private favs: FavsEntity;
 
-  constructor() {
-    this.users = [];
-    this.tracks = [];
-    this.artists = [];
-    this.albums = [];
-    this.favs = {
-      tracks: [],
-      albums: [],
-      artists: [],
-    };
-  }
+  // constructor() {
+  //   this.users = [];
+  //   this.tracks = [];
+  //   this.artists = [];
+  //   this.albums = [];
+  //   this.favs = {
+  //     tracks: [],
+  //     albums: [],
+  //     artists: [],
+  //   };
+  // }
 
-  getAll(field: DBFields): any[] | any {
-    return this[field];
+  async getAll(field: DBFields): Promise<any[]> {
+    const result = await this.user.findMany();
+
+    return result;
+
+    // return this[field];
   }
 
   getOne(field: DBFieldsWithId, id: string): Record<string, any> | undefined {

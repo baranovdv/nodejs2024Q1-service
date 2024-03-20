@@ -24,37 +24,39 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @Header('Content-Type', 'application/json')
-  getAllUsers(): UserEntity[] {
-    return this.usersService.getAllUsers();
+  async getAllUsers(): Promise<UserEntity[]> {
+    return await this.usersService.getAllUsers();
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  getOneUser(@Param('id', ParseUUIDPipe) id: string): UserEntity {
-    return this.usersService.getOneUser(id);
+  async getOneUser(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<UserEntity> {
+    return await this.usersService.getOneUser(id);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   @Header('Content-Type', 'application/json')
-  create(@Body() createUserDto: CreateUserDto): UserEntity {
-    return this.usersService.createUser(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
+    return await this.usersService.createUser(createUserDto);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @Header('Content-Type', 'application/json')
-  update(
+  async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateUserDto: UpdatePasswordDto,
   ) {
-    return this.usersService.updateUserPassword(id, updateUserDto);
+    return await this.usersService.updateUserPassword(id, updateUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.deleteUser(id);
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.usersService.deleteUser(id);
   }
 }

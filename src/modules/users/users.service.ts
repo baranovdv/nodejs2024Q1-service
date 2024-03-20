@@ -6,49 +6,61 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
-import { DBFieldsWithId } from 'src/data/types';
+import { DBUserType } from 'src/data/types';
 import { UserEntity } from '../db/entities/entities';
 
-const ITEM_TYPE: DBFieldsWithId = 'users';
 const NO_SUCH_ITEM = 'No such user';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly dbService: DBService) {}
 
-  getAllUsers(): UserEntity[] {
-    const users = this.dbService.getAll(ITEM_TYPE);
+  async getAllUsers(): Promise<UserEntity[]> {
+    const users = await this.dbService.user.findMany();
 
-    return users.map((user) => new UserEntity(user));
+    return users.map((user) => new UserEntity(this.changeUserDateFromDB(user)));
   }
 
-  getOneUser(id: string): UserEntity {
-    const user = this.dbService.getOne(ITEM_TYPE, id);
+  async getOneUser(id: string): Promise<UserEntity> {
+    const user = await this.dbService.user.findUnique({
+      where: { id },
+    });
 
-    if (user === undefined) {
+    if (!user) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
-    return new UserEntity(user);
+    return new UserEntity(this.changeUserDateFromDB(user));
   }
 
-  createUser(dto: CreateUserDto): UserEntity {
+  async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const newUser = {
       id: uuidv4(),
       login: dto.login,
       password: dto.password,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
-    this.dbService.create(ITEM_TYPE, newUser);
+    const user = await this.dbService.user.create({
+      data: newUser,
+    });
 
-    return new UserEntity(newUser);
+    return new UserEntity(this.changeUserDateFromDB(user));
   }
 
-  updateUserPassword(id: string, dto: UpdatePasswordDto): UserEntity {
-    const user = this.getOneUser(id);
+  async updateUserPassword(
+    id: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserEntity> {
+    const user = await this.dbService.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
 
     if (dto.oldPassword !== user.password) {
       throw new ForbiddenException('Wrong password');
@@ -56,22 +68,33 @@ export class UsersService {
 
     user.password = dto.newPassword;
     user.version += 1;
-    user.updatedAt = Date.now();
+    user.updatedAt = new Date();
 
-    const updateResult = this.dbService.update(ITEM_TYPE, id, user);
+    const updatedUser = await this.dbService.user.update({
+      where: { id },
+      data: user,
+    });
 
-    if (!updateResult) {
+    if (!updatedUser) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
-    return new UserEntity(user);
+    return new UserEntity(this.changeUserDateFromDB(updatedUser));
   }
 
-  deleteUser(id: string): void {
-    const deleteResult = this.dbService.delete(ITEM_TYPE, id);
-
-    if (!deleteResult) {
+  async deleteUser(id: string): Promise<void> {
+    try {
+      await this.dbService.user.delete({ where: { id } });
+    } catch {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
+  }
+
+  changeUserDateFromDB(user: DBUserType): UserEntity {
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
   }
 }
