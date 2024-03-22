@@ -6,13 +6,11 @@ import {
 } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
-import { DBFieldsWithId } from 'src/data/types';
 import { ArtistEntity } from '../db/entities/entities';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
 import { TracksService } from '../tracks/tracks.service';
 import { AlbumsService } from '../albums/albums.service';
 
-const ITEM_TYPE: DBFieldsWithId = 'artists';
 const NO_SUCH_ITEM = 'No such artist';
 
 @Injectable()
@@ -24,52 +22,68 @@ export class ArtistsService {
     private readonly albumsService: AlbumsService,
   ) {}
 
-  getAllArtists(): ArtistEntity[] {
-    return this.dbService.getAll(ITEM_TYPE);
+  async getAllArtists(): Promise<ArtistEntity[]> {
+    return this.dbService.artist.findMany();
   }
 
-  getOneArtist(id: string): ArtistEntity {
-    return this.dbService.getOne(ITEM_TYPE, id) as ArtistEntity | undefined;
-  }
+  async getOneArtist(id: string): Promise<ArtistEntity> {
+    const artist = await this.dbService.artist.findUnique({
+      where: { id },
+    });
 
-  createArtist(dto: CreateArtistDto): ArtistEntity {
-    const newArtist: ArtistEntity = {
-      id: uuidv4(),
-      ...dto,
-    };
-
-    this.dbService.create(ITEM_TYPE, newArtist);
-
-    return newArtist;
-  }
-
-  updateArtist(id: string, dto: UpdateArtistdDto): ArtistEntity {
-    let artist = this.getOneArtist(id);
-
-    artist = {
-      ...artist,
-      ...dto,
-    };
-
-    const updateResult = this.dbService.update(ITEM_TYPE, id, artist);
-
-    if (!updateResult) {
+    if (!artist) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
     return artist;
   }
 
-  deleteArtist(id: string): void {
-    const deleteResult = this.dbService.delete(ITEM_TYPE, id);
+  async createArtist(dto: CreateArtistDto): Promise<ArtistEntity> {
+    const newArtist: ArtistEntity = {
+      id: uuidv4(),
+      ...dto,
+    };
 
-    if (!deleteResult) {
+    const createdArtist = await this.dbService.artist.create({
+      data: newArtist,
+    });
+
+    return createdArtist;
+  }
+
+  async updateArtist(id: string, dto: UpdateArtistdDto): Promise<ArtistEntity> {
+    let artist = await this.dbService.artist.findUnique({
+      where: { id },
+    });
+
+    if (!artist) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
-    this.tracksService.nullArtistIdInTrackByArtistId(id);
-    this.albumsService.nullArtistIdInAlbumByArtistId(id);
+    artist = {
+      ...artist,
+      ...dto,
+    };
 
-    this.dbService.deleteFav('artist', id);
+    const updatedArtist = await this.dbService.artist.update({
+      where: { id },
+      data: artist,
+    });
+
+    if (!updatedArtist) {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
+
+    return updatedArtist;
+  }
+
+  async deleteArtist(id: string): Promise<void> {
+    try {
+      await this.dbService.artist.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
+
+    // this.dbService.deleteFav('artist', id);
   }
 }
