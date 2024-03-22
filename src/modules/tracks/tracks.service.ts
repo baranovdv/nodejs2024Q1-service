@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
-import { TrackEntity } from '../db/entities/entities';
+import { Track } from '@prisma/client';
 
 const NO_SUCH_ITEM = 'No such track';
 
@@ -10,11 +10,11 @@ const NO_SUCH_ITEM = 'No such track';
 export class TracksService {
   constructor(private readonly dbService: DBService) {}
 
-  async getAllTracks(): Promise<TrackEntity[]> {
+  async getAllTracks(): Promise<Track[]> {
     return await this.dbService.track.findMany();
   }
 
-  async getOneTrack(id: string): Promise<TrackEntity> {
+  async getOneTrack(id: string): Promise<Track> {
     const track = await this.dbService.track.findUnique({
       where: { id },
     });
@@ -26,7 +26,7 @@ export class TracksService {
     return track;
   }
 
-  async createTrack(dto: CreateTrackDto): Promise<TrackEntity> {
+  async createTrack(dto: CreateTrackDto): Promise<Track> {
     const newTrack = {
       id: uuidv4(),
       ...dto,
@@ -39,7 +39,7 @@ export class TracksService {
     return createdTrack;
   }
 
-  async updateTrack(id: string, dto: UpdateTrackdDto): Promise<TrackEntity> {
+  async updateTrack(id: string, dto: UpdateTrackdDto): Promise<Track> {
     let track = await this.dbService.track.findUnique({
       where: { id },
     });

@@ -11,9 +11,9 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { AlbumEntity } from '../db/entities/entities';
 import { CreateAlbumDto, UpdateAlbumdDto } from './dto/album.dto';
 import { AlbumsService } from './albums.service';
+import { Album } from '@prisma/client';
 
 @Controller('album')
 export class AlbumsController {
@@ -21,21 +21,19 @@ export class AlbumsController {
 
   @Get()
   @Header('Content-Type', 'application/json')
-  async getAllTracks(): Promise<AlbumEntity[]> {
+  async getAllTracks(): Promise<Album[]> {
     return await this.albumsService.getAllAlbums();
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  async getOneUser(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<AlbumEntity> {
+  async getOneUser(@Param('id', ParseUUIDPipe) id: string): Promise<Album> {
     return await this.albumsService.getOneAlbum(id);
   }
 
   @Post()
   @Header('Content-Type', 'application/json')
-  async create(@Body() createAlbumDto: CreateAlbumDto): Promise<AlbumEntity> {
+  async create(@Body() createAlbumDto: CreateAlbumDto): Promise<Album> {
     return await this.albumsService.createAlbum(createAlbumDto);
   }
 

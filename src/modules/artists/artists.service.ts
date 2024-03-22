@@ -1,32 +1,20 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  forwardRef,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
-import { ArtistEntity } from '../db/entities/entities';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
-import { TracksService } from '../tracks/tracks.service';
-import { AlbumsService } from '../albums/albums.service';
+import { Artist } from '@prisma/client';
 
 const NO_SUCH_ITEM = 'No such artist';
 
 @Injectable()
 export class ArtistsService {
-  constructor(
-    private readonly dbService: DBService,
-    @Inject(forwardRef(() => TracksService))
-    private readonly tracksService: TracksService,
-    private readonly albumsService: AlbumsService,
-  ) {}
+  constructor(private readonly dbService: DBService) {}
 
-  async getAllArtists(): Promise<ArtistEntity[]> {
+  async getAllArtists(): Promise<Artist[]> {
     return this.dbService.artist.findMany();
   }
 
-  async getOneArtist(id: string): Promise<ArtistEntity> {
+  async getOneArtist(id: string): Promise<Artist> {
     const artist = await this.dbService.artist.findUnique({
       where: { id },
     });
@@ -38,8 +26,8 @@ export class ArtistsService {
     return artist;
   }
 
-  async createArtist(dto: CreateArtistDto): Promise<ArtistEntity> {
-    const newArtist: ArtistEntity = {
+  async createArtist(dto: CreateArtistDto): Promise<Artist> {
+    const newArtist: Artist = {
       id: uuidv4(),
       ...dto,
     };
@@ -51,7 +39,7 @@ export class ArtistsService {
     return createdArtist;
   }
 
-  async updateArtist(id: string, dto: UpdateArtistdDto): Promise<ArtistEntity> {
+  async updateArtist(id: string, dto: UpdateArtistdDto): Promise<Artist> {
     let artist = await this.dbService.artist.findUnique({
       where: { id },
     });
