@@ -2,85 +2,76 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
-import { DBFieldsWithId } from 'src/data/types';
 import { TrackEntity } from '../db/entities/entities';
 
-const ITEM_TYPE: DBFieldsWithId = 'tracks';
 const NO_SUCH_ITEM = 'No such track';
 
 @Injectable()
 export class TracksService {
   constructor(private readonly dbService: DBService) {}
 
-  getAllTracks(): TrackEntity[] {
-    return this.dbService.getAll(ITEM_TYPE);
+  async getAllTracks(): Promise<TrackEntity[]> {
+    return await this.dbService.track.findMany();
   }
 
-  getOneTrack(id: string): TrackEntity | undefined {
-    return this.dbService.getOne(ITEM_TYPE, id) as TrackEntity | undefined;
-  }
+  async getOneTrack(id: string): Promise<TrackEntity> {
+    const track = await this.dbService.track.findUnique({
+      where: { id },
+    });
 
-  createTrack(dto: CreateTrackDto): TrackEntity {
-    const newTrack: TrackEntity = {
-      id: uuidv4(),
-      ...dto,
-    };
-
-    this.dbService.create(ITEM_TYPE, newTrack);
-
-    return newTrack;
-  }
-
-  updateTrack(id: string, dto: UpdateTrackdDto): TrackEntity {
-    let track = this.getOneTrack(id);
-
-    track = {
-      ...track,
-      ...dto,
-    };
-
-    const updateResult = this.dbService.update(ITEM_TYPE, id, track);
-
-    if (!updateResult) {
+    if (!track) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
     return track;
   }
 
-  deleteTrack(id: string): void {
-    const deleteResult = this.dbService.delete(ITEM_TYPE, id);
+  async createTrack(dto: CreateTrackDto): Promise<TrackEntity> {
+    const newTrack = {
+      id: uuidv4(),
+      ...dto,
+    };
 
-    if (!deleteResult) {
+    const createdTrack = await this.dbService.track.create({
+      data: newTrack,
+    });
+
+    return createdTrack;
+  }
+
+  async updateTrack(id: string, dto: UpdateTrackdDto): Promise<TrackEntity> {
+    let track = await this.dbService.track.findUnique({
+      where: { id },
+    });
+
+    if (!track) {
       throw new NotFoundException(NO_SUCH_ITEM);
     }
 
-    this.dbService.deleteFav('track', id);
+    track = {
+      ...track,
+      ...dto,
+    };
+
+    const updatedTrack = await this.dbService.track.update({
+      where: { id },
+      data: track,
+    });
+
+    if (!updatedTrack) {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
+
+    return updatedTrack;
   }
 
-  nullArtistIdInTrackByArtistId(id: string): void {
-    const tracks = this.getAllTracks();
+  async deleteTrack(id: string): Promise<void> {
+    try {
+      await this.dbService.track.delete({ where: { id } });
+    } catch {
+      throw new NotFoundException(NO_SUCH_ITEM);
+    }
 
-    const track = tracks.find((track) => track.artistId === id);
-
-    if (!track) return;
-
-    this.updateTrack(track.id, {
-      ...track,
-      artistId: null,
-    });
-  }
-
-  nullAlbumIdInTrackByArtistId(id: string): void {
-    const tracks = this.getAllTracks();
-
-    const track = tracks.find((track) => track.albumId === id);
-
-    if (!track) return;
-
-    this.updateTrack(track.id, {
-      ...track,
-      albumId: null,
-    });
+    // this.dbService.deleteFav('track', id);
   }
 }
