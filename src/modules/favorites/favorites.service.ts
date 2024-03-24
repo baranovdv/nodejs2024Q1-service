@@ -1,99 +1,112 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-  forwardRef,
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { DBService } from '../db/db.service';
-import { DBFields, FavsTypes } from 'src/data/types';
-import { TracksService } from '../tracks/tracks.service';
+import { FavsTypes } from 'src/data/types';
+import { FAVS_ID } from 'src/data/data';
 import { FavsEntity } from '../db/entities/entities';
-import { ArtistsService } from '../artists/artists.service';
-import { AlbumsService } from '../albums/albums.service';
 
-const ITEM_TYPE: DBFields = 'favs';
 const NO_SUCH_ITEM = 'No such';
-const ITEM_IN_FAVS = 'already in favs';
 const NO_SUCH_ENDPOINT = 'No such endpoint';
 const ITEM_ADDED = 'was added to favorites';
 
 @Injectable()
 export class FavsService {
-  constructor(
-    private readonly dbService: DBService,
-    @Inject(forwardRef(() => TracksService))
-    private readonly tracksService: TracksService,
-    @Inject(forwardRef(() => ArtistsService))
-    private readonly artistsService: ArtistsService,
-    @Inject(forwardRef(() => AlbumsService))
-    private readonly albumsService: AlbumsService,
-  ) {}
+  private favsId = FAVS_ID;
 
-  getAllFavs(): FavsEntity {
-    return this.dbService.getAll(ITEM_TYPE);
+  constructor(private readonly dbService: DBService) {}
+
+  async getAllFavs(): Promise<FavsEntity> {
+    const favs = await this.dbService.favorites.findUnique({
+      where: { id: this.favsId },
+      select: {
+        artists: {
+          select: {
+            id: true,
+            name: true,
+            grammy: true,
+          },
+        },
+        albums: {
+          select: {
+            id: true,
+            name: true,
+            year: true,
+            artistId: true,
+          },
+        },
+        tracks: {
+          select: {
+            id: true,
+            name: true,
+            duration: true,
+            artistId: true,
+            albumId: true,
+          },
+        },
+      },
+    });
+
+    if (!favs) {
+      await this.dbService.favorites.update({
+        where: { id: this.favsId },
+        data: {},
+      });
+
+      return { artists: [], albums: [], tracks: [] };
+    }
+
+    return favs;
   }
 
-  addFav(favsType: FavsTypes, id: string) {
+  async addFav(favsType: FavsTypes, id: string) {
     switch (favsType) {
       case 'track': {
-        const track = this.tracksService.getOneTrack(id);
-
-        if (!track) {
+        try {
+          await this.dbService.favorites.update({
+            where: { id: this.favsId },
+            data: {
+              tracks: {
+                connect: { id },
+              },
+            },
+          });
+        } catch {
           throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
-
-        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
-
-        const favTrack = favs[`${favsType}s`].find((track) => track.id === id);
-
-        if (favTrack) {
-          throw new UnprocessableEntityException(`${favsType} ${ITEM_IN_FAVS}`);
-        }
-
-        this.dbService.addFav(favsType, track);
 
         return `${favsType} ${ITEM_ADDED}`;
       }
 
       case 'album': {
-        const album = this.albumsService.getOneAlbum(id);
-
-        if (!album) {
+        try {
+          await this.dbService.favorites.update({
+            where: { id: this.favsId },
+            data: {
+              albums: {
+                connect: { id },
+              },
+            },
+          });
+        } catch {
           throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
-
-        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
-
-        const favAlbum = favs[`${favsType}s`].find((album) => album.id === id);
-
-        if (favAlbum) {
-          throw new UnprocessableEntityException(`${favsType} ${ITEM_IN_FAVS}`);
-        }
-
-        this.dbService.addFav(favsType, album);
 
         return `${favsType} ${ITEM_ADDED}`;
       }
 
       case 'artist':
-        const artist = this.artistsService.getOneArtist(id);
-
-        if (!artist) {
+        try {
+          await this.dbService.favorites.update({
+            where: { id: this.favsId },
+            data: {
+              artists: {
+                connect: { id },
+              },
+            },
+          });
+        } catch {
           throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
 
-        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
-
-        const favArtist = favs[`${favsType}s`].find(
-          (artist) => artist.id === id,
-        );
-
-        if (favArtist) {
-          throw new UnprocessableEntityException(`${favsType} ${ITEM_IN_FAVS}`);
-        }
-
-        this.dbService.addFav(favsType, artist);
         return `${favsType} ${ITEM_ADDED}`;
 
       default: {
@@ -102,49 +115,57 @@ export class FavsService {
     }
   }
 
-  deleteFav(favsType: FavsTypes, id: string) {
+  async deleteFav(favsType: FavsTypes, id: string) {
     switch (favsType) {
       case 'track': {
-        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
-
-        const track = favs[`${favsType}s`].find((track) => track.id === id);
-
-        if (!track) {
-          throw new NotFoundException();
+        try {
+          await this.dbService.favorites.update({
+            where: { id: this.favsId },
+            data: {
+              tracks: {
+                disconnect: { id },
+              },
+            },
+          });
+        } catch {
+          throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
 
-        this.dbService.deleteFav(favsType, id);
-
-        return;
+        return `${favsType} ${ITEM_ADDED}`;
       }
 
       case 'album': {
-        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
-
-        const album = favs[`${favsType}s`].find((album) => album.id === id);
-
-        if (!album) {
-          throw new NotFoundException();
+        try {
+          await this.dbService.favorites.update({
+            where: { id: this.favsId },
+            data: {
+              albums: {
+                disconnect: { id },
+              },
+            },
+          });
+        } catch {
+          throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
 
-        this.dbService.deleteFav(favsType, id);
-
-        return;
+        return `${favsType} ${ITEM_ADDED}`;
       }
 
-      case 'artist': {
-        const favs: FavsEntity = this.dbService.getAll(ITEM_TYPE);
-
-        const artist = favs[`${favsType}s`].find((artist) => artist.id === id);
-
-        if (!artist) {
-          throw new NotFoundException();
+      case 'artist':
+        try {
+          await this.dbService.favorites.update({
+            where: { id: this.favsId },
+            data: {
+              artists: {
+                disconnect: { id },
+              },
+            },
+          });
+        } catch {
+          throw new UnprocessableEntityException(`${NO_SUCH_ITEM} ${favsType}`);
         }
 
-        this.dbService.deleteFav(favsType, id);
-
-        return;
-      }
+        return `${favsType} ${ITEM_ADDED}`;
 
       default: {
         throw new UnprocessableEntityException(NO_SUCH_ENDPOINT);
