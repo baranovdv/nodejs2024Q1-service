@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
 import { Track } from '@prisma/client';
@@ -27,13 +26,8 @@ export class TracksService {
   }
 
   async createTrack(dto: CreateTrackDto): Promise<Track> {
-    const newTrack = {
-      id: uuidv4(),
-      ...dto,
-    };
-
     const createdTrack = await this.dbService.track.create({
-      data: newTrack,
+      data: dto,
     });
 
     return createdTrack;

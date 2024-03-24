@@ -21,13 +21,13 @@ export class AlbumsController {
 
   @Get()
   @Header('Content-Type', 'application/json')
-  async getAllTracks(): Promise<Album[]> {
+  async getAllArtists(): Promise<Album[]> {
     return await this.albumsService.getAllAlbums();
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  async getOneUser(@Param('id', ParseUUIDPipe) id: string): Promise<Album> {
+  async getOneArtist(@Param('id', ParseUUIDPipe) id: string): Promise<Album> {
     return await this.albumsService.getOneAlbum(id);
   }
 

@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { TracksService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackdDto } from './dto/track.dto';
-import { TrackEntity } from '../db/entities/entities';
+import { Track } from '@prisma/client';
 
 @Controller('track')
 export class TracksController {
@@ -21,21 +21,19 @@ export class TracksController {
 
   @Get()
   @Header('Content-Type', 'application/json')
-  async getAllTracks(): Promise<TrackEntity[]> {
+  async getAllTracks(): Promise<Track[]> {
     return await this.tracksService.getAllTracks();
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  async getOneUser(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<TrackEntity> {
+  async getOneTrack(@Param('id', ParseUUIDPipe) id: string): Promise<Track> {
     return await this.tracksService.getOneTrack(id);
   }
 
   @Post()
   @Header('Content-Type', 'application/json')
-  async create(@Body() createTrackDto: CreateTrackDto): Promise<TrackEntity> {
+  async create(@Body() createTrackDto: CreateTrackDto): Promise<Track> {
     return await this.tracksService.createTrack(createTrackDto);
   }
 
@@ -44,7 +42,7 @@ export class TracksController {
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateTrackDto: UpdateTrackdDto,
-  ): Promise<TrackEntity> {
+  ): Promise<Track> {
     return await this.tracksService.updateTrack(id, updateTrackDto);
   }
 

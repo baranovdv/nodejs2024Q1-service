@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateAlbumDto, UpdateAlbumdDto } from './dto/album.dto';
 import { Album } from '@prisma/client';
@@ -27,13 +26,8 @@ export class AlbumsService {
   }
 
   async createAlbum(dto: CreateAlbumDto): Promise<Album> {
-    const newAlbum: Album = {
-      id: uuidv4(),
-      ...dto,
-    };
-
     const createdAlbum = await this.dbService.album.create({
-      data: newAlbum,
+      data: dto,
     });
 
     return createdAlbum;

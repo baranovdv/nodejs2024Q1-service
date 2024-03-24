@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 import { DBService } from '../db/db.service';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
 import { Artist } from '@prisma/client';
@@ -27,13 +26,8 @@ export class ArtistsService {
   }
 
   async createArtist(dto: CreateArtistDto): Promise<Artist> {
-    const newArtist: Artist = {
-      id: uuidv4(),
-      ...dto,
-    };
-
     const createdArtist = await this.dbService.artist.create({
-      data: newArtist,
+      data: dto,
     });
 
     return createdArtist;

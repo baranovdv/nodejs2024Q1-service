@@ -12,8 +12,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
-import { ArtistEntity } from '../db/entities/entities';
 import { CreateArtistDto, UpdateArtistdDto } from './dto/artist.dto';
+import { Artist } from '@prisma/client';
 
 @Controller('artist')
 export class ArtistsController {
@@ -21,21 +21,19 @@ export class ArtistsController {
 
   @Get()
   @Header('Content-Type', 'application/json')
-  async getAllTracks(): Promise<ArtistEntity[]> {
+  async getAllArtists(): Promise<Artist[]> {
     return await this.artistsService.getAllArtists();
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  async getOneUser(
-    @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<ArtistEntity> {
+  async getOneArtist(@Param('id', ParseUUIDPipe) id: string): Promise<Artist> {
     return await this.artistsService.getOneArtist(id);
   }
 
   @Post()
   @Header('Content-Type', 'application/json')
-  create(@Body() createArtistDto: CreateArtistDto): Promise<ArtistEntity> {
+  create(@Body() createArtistDto: CreateArtistDto): Promise<Artist> {
     return this.artistsService.createArtist(createArtistDto);
   }
 
