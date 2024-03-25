@@ -24,14 +24,16 @@ services:
       - POSTGRES_PASSWORD={PG_PASSWORD}
       - POSTGRES_DB={PG_PASSWORD}
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgresData:/var/lib/postgresql/data
+      - postgresLogs:/var/log/postgresql
     networks:
       - innerNetwork
     ports:
       - ${PG_PORT}:${PG_PORT}
 
 volumes:
-  postgres:
+  postgresData:
+  postgresLogs:
 networks:
   innerNetwork:
     driver: bridge
