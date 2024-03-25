@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdatePasswordDto } from './dto/user.dto';
-import { UserEntity } from '../db/entities/entities';
+import { UserEntity } from './entity/entity';
 
 @Controller('user')
 export class UsersController {

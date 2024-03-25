@@ -1,13 +1,11 @@
 FROM node
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package*.json .
 
 RUN npm install
 
 COPY . .
 
-EXPOSE 4000
-
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "backend:start"]

@@ -1,16 +1,38 @@
 version: '3.8'
 services:
+  backend:
+    env_file:
+      - .env
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_started
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      - innerNetwork
+    volumes:
+      - /usr/src/app/node_modules
 
   postgres:
     image: postgres:15
     restart: always
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_USER={PG_USER}
+      - POSTGRES_PASSWORD={PG_PASSWORD}
+      - POSTGRES_DB={PG_PASSWORD}
     volumes:
       - postgres:/var/lib/postgresql/data
+    networks:
+      - innerNetwork
     ports:
-      - '5433:5432'
+      - ${PG_PORT}:${PG_PORT}
 
 volumes:
   postgres:
+networks:
+  innerNetwork:
+    driver: bridge
