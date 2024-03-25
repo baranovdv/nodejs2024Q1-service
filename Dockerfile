@@ -1,4 +1,4 @@
-FROM node
+FROM node:20.11-alpine as build
 
 WORKDIR /usr/src/app
 
@@ -8,4 +8,10 @@ RUN npm install
 
 COPY . .
 
-CMD ["npm", "run", "backend:start"]
+FROM node:20.11-alpine
+
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app /usr/src/app
+
+CMD ["npm", "run", "start:app"]

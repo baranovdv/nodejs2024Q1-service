@@ -1,7 +1,6 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { FavsTypes } from 'src/data/types';
-import { FAVS_ID } from 'src/data/data';
 import { FavsEntity } from '../db/entities/entities';
 
 const NO_SUCH_ITEM = 'No such';
@@ -10,13 +9,11 @@ const ITEM_ADDED = 'was added to favorites';
 
 @Injectable()
 export class FavsService {
-  private favsId = FAVS_ID;
-
   constructor(private readonly dbService: DBService) {}
 
   async getAllFavs(): Promise<FavsEntity> {
     const favs = await this.dbService.favorites.findUnique({
-      where: { id: this.favsId },
+      where: { id: '1' },
       select: {
         artists: {
           select: {
@@ -46,8 +43,7 @@ export class FavsService {
     });
 
     if (!favs) {
-      await this.dbService.favorites.update({
-        where: { id: this.favsId },
+      await this.dbService.favorites.create({
         data: {},
       });
 
@@ -62,7 +58,7 @@ export class FavsService {
       case 'track': {
         try {
           await this.dbService.favorites.update({
-            where: { id: this.favsId },
+            where: { id: '1' },
             data: {
               tracks: {
                 connect: { id },
@@ -79,7 +75,7 @@ export class FavsService {
       case 'album': {
         try {
           await this.dbService.favorites.update({
-            where: { id: this.favsId },
+            where: { id: '1' },
             data: {
               albums: {
                 connect: { id },
@@ -96,7 +92,7 @@ export class FavsService {
       case 'artist':
         try {
           await this.dbService.favorites.update({
-            where: { id: this.favsId },
+            where: { id: '1' },
             data: {
               artists: {
                 connect: { id },
@@ -120,7 +116,7 @@ export class FavsService {
       case 'track': {
         try {
           await this.dbService.favorites.update({
-            where: { id: this.favsId },
+            where: { id: '1' },
             data: {
               tracks: {
                 disconnect: { id },
@@ -137,7 +133,7 @@ export class FavsService {
       case 'album': {
         try {
           await this.dbService.favorites.update({
-            where: { id: this.favsId },
+            where: { id: '1' },
             data: {
               albums: {
                 disconnect: { id },
@@ -154,7 +150,7 @@ export class FavsService {
       case 'artist':
         try {
           await this.dbService.favorites.update({
-            where: { id: this.favsId },
+            where: { id: '1' },
             data: {
               artists: {
                 disconnect: { id },
