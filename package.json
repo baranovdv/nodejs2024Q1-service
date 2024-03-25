@@ -18,6 +18,7 @@
     "prisma:seed": "npx prisma db seed",
     "start:app": "npx prisma migrate dev --name 'init' && npm run start:dev",
     "start": "nest start",
+    "scout:test": "docker scout cves baranovdv/home-library",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
