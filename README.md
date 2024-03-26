@@ -4,11 +4,18 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker desktop [Download & Install Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone {https://github.com/baranovdv/nodejs2024Q1-service}
+```
+
+## Choose branch
+
+```
+git co develop-part2
 ```
 
 ## Installing NPM modules
@@ -19,13 +26,18 @@ npm install
 
 ## Running application
 
+Rename .env.example to .env
+
 ```
-npm start
+docker-compose up
 ```
 
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
+## Test home-library container
+Docker Scout included in Docker Desktop after v4.17
+
+```
+npm run scout:test
+```
 
 ## Testing
 
@@ -54,19 +66,3 @@ To run only specific test suite with authorization
 ```
 npm run test:auth -- <path to suite>
 ```
-
-### Auto-fix and format
-
-```
-npm run lint
-```
-
-```
-npm run format
-```
-
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging

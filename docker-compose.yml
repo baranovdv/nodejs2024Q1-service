@@ -1,0 +1,39 @@
+services:
+  backend:
+    env_file:
+      - .env
+    image: baranovdv/home_library
+    depends_on:
+      postgres:
+        condition: service_started
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    networks:
+      - innerNetwork
+    volumes:
+      - /usr/src/app/node_modules
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_HOST=${PG_HOST}
+      - POSTGRES_PORT=${PG_PORT}
+      - POSTGRES_DB=${PG_NAME}
+    volumes:
+      - postgresData:/var/lib/postgresql/data
+      - postgresLogs:/var/log/postgresql
+    networks:
+      - innerNetwork
+    ports:
+      - ${PG_PORT}:${PG_PORT}
+
+volumes:
+  postgresData:
+  postgresLogs:
+networks:
+  innerNetwork:
+    driver: bridge
